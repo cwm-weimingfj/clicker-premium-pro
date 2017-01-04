@@ -38,38 +38,16 @@ var model = {
 };
 
 
-/* ======= Octopus ======= */
 
-var octopus = {
 
-    init: function() {
-        // set our current cat to the first one in the list
-        model.currentCat = model.cats[0];
 
-        // tell our views to initialize
-        catListView.init();
-        catView.init();
-    },
 
-    getCurrentCat: function() {
-        return model.currentCat;
-    },
 
-    getCats: function() {
-        return model.cats;
-    },
 
-    // set the currently-selected cat to the object passed in
-    setCurrentCat: function(cat) {
-        model.currentCat = cat;
-    },
 
-    // increments the counter for the currently-selected cat
-    incrementCounter: function() {
-        model.currentCat.clickCount++;
-        catView.render();
-    }
-};
+
+
+
 
 
 /* ======= View ======= */
@@ -78,7 +56,6 @@ var catView = {
 
     init: function() {
         // store pointers to our DOM elements for easy access later
-
         this.catElem = $('#cat');
         this.catNameElem = $('#cat-name');
         this.catImageElem = $('#cat-img');
@@ -118,9 +95,6 @@ var catListView = {
         // get the cats we'll be rendering from the octopus
         var cats = octopus.getCats();
 
-        // empty the cat list
-        this.catListElem.html('');
-
         // loop over the cats
         for (i = 0; i < cats.length; i++) {
             // this is the cat we're currently looping over
@@ -137,6 +111,7 @@ var catListView = {
                 var fn = function() {
                     octopus.setCurrentCat(catCopy);
                     catView.render();
+                    
                 }
                 return fn;
             }(cat));
@@ -146,6 +121,122 @@ var catListView = {
         }
     }
 };
+
+var adminView = {
+    init: function() {
+        $("#admin-content-panel").css("display", "none");
+        this.render();
+
+    },
+
+    render: function() {
+        // current cat
+        var currentCat = octopus.getCurrentCat();
+
+        // current cat info
+        var name = currentCat.name;
+        var clicks = currentCat.clickCount;
+        var url = currentCat.imgSrc;
+
+        // buttons & panels
+        var adminButton = $("#adminbutton");
+        var cancelButton = $("#cancelbutton");
+        var saveButton = $("#savebutton");
+
+        var adminPanel = $("#admin-content-panel");
+
+        // input fields
+        var nameInputField = $("#catnameinput");
+        var urlInputField = $("#caturlinput");
+        var clicksInputField = $("#catclicksinput");
+
+        // click event on admin button
+        adminButton.click(function() {
+            adminPanel.css("display", "block");
+            nameInputField.val(name);
+            urlInputField.val(url);
+            clicksInputField.val(clicks);
+        });
+
+        // click event on cencel button
+        cancelButton.click(function() {
+            adminPanel.css("display", "none");
+        });
+
+
+        // click event on save button
+        saveButton.click(function() {
+            console.log("save btn clicked");
+
+            // get updated values
+            var nameValue = nameInputField.val();
+            var urlValue = urlInputField.val();
+            var clicksValue = clicksInputField.val();
+
+            octopus.adminSaveCatInfo(currentCat, nameValue, clicksValue, urlValue);
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ======= Octopus ======= */
+
+var octopus = {
+
+    init: function() {
+        // set our current cat to the first one in the list
+        model.currentCat = model.cats[0];
+
+        // tell our views to initialize
+        catListView.init();
+        catView.init();
+        adminView.init();
+    },
+
+    getCurrentCat: function() {
+        return model.currentCat;
+    },
+
+    getCats: function() {
+        return model.cats;
+    },
+
+    // set the currently-selected cat to the object passed in
+    setCurrentCat: function(cat) {
+        model.currentCat = cat;
+    },
+
+    // increments the counter for the currently-selected cat
+    incrementCounter: function() {
+        model.currentCat.clickCount++;
+        catView.render();
+    },
+
+    // Admin save cat info.
+    adminSaveCatInfo: function(cat, name, clicks, url) {
+        console.log("start saving");
+        cat.name = name;
+        cat.imgSrc = url;
+        cat.clickCount = clicks;
+        console.log("saved");
+
+        console.log("start rendering cat view");
+        catView.render();
+        console.log("cat view rendered");
+    }
+};
+
 
 // make it go!
 octopus.init();
