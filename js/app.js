@@ -78,13 +78,14 @@ var catView = {
 
     init: function() {
         // store pointers to our DOM elements for easy access later
-        this.catElem = document.getElementById('cat');
-        this.catNameElem = document.getElementById('cat-name');
-        this.catImageElem = document.getElementById('cat-img');
-        this.countElem = document.getElementById('cat-count');
+
+        this.catElem = $('#cat');
+        this.catNameElem = $('#cat-name');
+        this.catImageElem = $('#cat-img');
+        this.countElem = $('#cat-count');
 
         // on click, increment the current cat's counter
-        this.catImageElem.addEventListener('click', function(){
+        this.catImageElem.click(function() {
             octopus.incrementCounter();
         });
 
@@ -95,17 +96,18 @@ var catView = {
     render: function() {
         // update the DOM elements with values from the current cat
         var currentCat = octopus.getCurrentCat();
-        this.countElem.textContent = currentCat.clickCount;
-        this.catNameElem.textContent = currentCat.name;
-        this.catImageElem.src = currentCat.imgSrc;
+
+        this.countElem.text(currentCat.clickCount);
+        this.catNameElem.text(currentCat.name);
+        this.catImageElem.attr("src", currentCat.imgSrc);
     }
 };
 
 var catListView = {
 
     init: function() {
-        // store the DOM element for easy access later
-        this.catListElem = document.getElementById('cat-list');
+        // store the DOM element for easy access later (jQ)
+        this.catListElem = $('#cat-list');
 
         // render this view (update the DOM elements with the right values)
         this.render();
@@ -117,7 +119,7 @@ var catListView = {
         var cats = octopus.getCats();
 
         // empty the cat list
-        this.catListElem.innerHTML = '';
+        this.catListElem.html('');
 
         // loop over the cats
         for (i = 0; i < cats.length; i++) {
@@ -125,21 +127,22 @@ var catListView = {
             cat = cats[i];
 
             // make a new cat list item and set its text
-            elem = document.createElement('li');
-            elem.textContent = cat.name;
+            elem = $("<li>").text(cat.name);
 
             // on click, setCurrentCat and render the catView
             // (this uses our closure-in-a-loop trick to connect the value
             //  of the cat variable to the click event function)
-            elem.addEventListener('click', (function(catCopy) {
-                return function() {
+            elem.click(function(catCopy) {
+                // a callback function retuan a function for callback.
+                var fn = function() {
                     octopus.setCurrentCat(catCopy);
                     catView.render();
-                };
-            })(cat));
+                }
+                return fn;
+            }(cat));
 
             // finally, add the element to the list
-            this.catListElem.appendChild(elem);
+            this.catListElem.append(elem);
         }
     }
 };
